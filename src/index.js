@@ -56,7 +56,7 @@ export function parseSkillMarkdown(markdown, context = {}) {
     name: normalizeTitle(title),
     slug: slugify(context.directory ?? title),
     sourcePath: context.sourcePath ?? null,
-    description: firstContent(sections.description) ?? firstParagraphAfterTitle(markdown),
+    description: firstContent(sections.description) || firstParagraphAfterTitle(markdown),
     whenToUse: normalizeBlock(sections.whenToUse),
     requiredTools: listItems(sections.requiredTools),
     inputs: listItems(sections.inputs),
