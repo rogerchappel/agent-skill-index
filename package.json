@@ -1,0 +1,33 @@
+{
+  "name": "agent-skill-index",
+  "version": "0.1.0",
+  "description": "Generate searchable catalogs for local agent skills and safety metadata.",
+  "type": "module",
+  "bin": {
+    "agent-skill-index": "./bin/agent-skill-index.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "SKILL.md",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check bin/agent-skill-index.js",
+    "smoke": "node bin/agent-skill-index.js test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md && test -s tmp/skill-index.json && test -s tmp/SKILLS.md",
+    "build": "npm run check"
+  },
+  "keywords": [
+    "agents",
+    "skills",
+    "catalog",
+    "safety",
+    "cli"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
