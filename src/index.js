@@ -133,8 +133,11 @@ function firstHeading(markdown) {
 }
 
 function firstParagraphAfterTitle(markdown) {
-  return markdown
+  const intro = markdown
     .replace(/^#\s+.+$/m, "")
+    .split(/^#{2,3}\s+/m)[0];
+
+  return intro
     .split(/\n{2,}/)
     .map((block) => block.trim())
     .find((block) => block && !block.startsWith("#") && !block.startsWith("```"));
