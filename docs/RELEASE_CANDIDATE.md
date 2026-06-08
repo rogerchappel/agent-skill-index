@@ -21,6 +21,8 @@ npm run smoke
 bash scripts/validate.sh
 ```
 
+All commands passed locally on 2026-06-08.
+
 ## Known Limits
 
 - Section parsing intentionally supports common Markdown headings rather than a strict schema.
