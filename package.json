@@ -4,14 +4,15 @@
   "description": "Generate searchable catalogs for local agent skills and safety metadata.",
   "type": "module",
   "bin": {
-    "agent-skill-index": "./bin/agent-skill-index.js"
+    "agent-skill-index": "bin/agent-skill-index.js"
   },
   "files": [
     "bin",
     "src",
     "docs",
     "SKILL.md",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "test": "node --test",
@@ -29,5 +30,14 @@
   "license": "MIT",
   "engines": {
     "node": ">=20"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/agent-skill-index.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/agent-skill-index/issues"
+  },
+  "homepage": "https://github.com/rogerchappel/agent-skill-index#readme",
+  "author": "Roger Chappel"
 }
