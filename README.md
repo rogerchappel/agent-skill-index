@@ -51,5 +51,14 @@ This project is local-first. It reads only under the skill root you provide and 
 npm test
 npm run check
 npm run smoke
+npm run release:check
 bash scripts/validate.sh
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Security
+
+See [SECURITY.md](SECURITY.md).
