@@ -12,13 +12,17 @@
     "docs",
     "SKILL.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
   ],
   "scripts": {
     "test": "node --test",
     "check": "node --check src/index.js && node --check bin/agent-skill-index.js",
     "smoke": "node bin/agent-skill-index.js test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md && test -s tmp/skill-index.json && test -s tmp/SKILLS.md",
-    "build": "npm run check"
+    "build": "npm run check",
+    "package:smoke": "npm pack --dry-run",
+    "release:check": "npm test && npm run check && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "agents",
@@ -28,6 +32,7 @@
     "cli"
   ],
   "license": "MIT",
+  "author": "Roger Chappel",
   "engines": {
     "node": ">=20"
   },
@@ -38,6 +43,5 @@
   "bugs": {
     "url": "https://github.com/rogerchappel/agent-skill-index/issues"
   },
-  "homepage": "https://github.com/rogerchappel/agent-skill-index#readme",
-  "author": "Roger Chappel"
+  "homepage": "https://github.com/rogerchappel/agent-skill-index#readme"
 }
