@@ -11,7 +11,8 @@
     "src",
     "docs",
     "SKILL.md",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "test": "node --test",
