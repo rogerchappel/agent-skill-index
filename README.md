@@ -55,3 +55,11 @@ npm run package:smoke
 npm run release:check
 bash scripts/validate.sh
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Security
+
+See [SECURITY.md](SECURITY.md).
