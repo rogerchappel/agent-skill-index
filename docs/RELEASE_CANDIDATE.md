@@ -18,10 +18,13 @@ Ship.
 npm test
 npm run check
 npm run smoke
+npm run package:smoke
+npm run release:check
 bash scripts/validate.sh
 ```
 
-All commands passed locally on 2026-06-08.
+The package smoke should show the CLI, source, docs, skill file, README, license,
+security policy, and contribution guide in the dry-run tarball contents.
 
 ## Known Limits
 
