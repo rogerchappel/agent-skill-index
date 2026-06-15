@@ -9,10 +9,12 @@
   "files": [
     "bin",
     "src",
+    "examples",
     "docs",
     "SKILL.md",
     "README.md",
     "LICENSE",
+    "CHANGELOG.md",
     "CONTRIBUTING.md",
     "SECURITY.md"
   ],

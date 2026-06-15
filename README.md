@@ -7,7 +7,7 @@ Generate a searchable catalog for local agent skills. The CLI scans skill folder
 ```bash
 npm install
 npm run smoke
-node bin/agent-skill-index.js ./test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md
+node bin/agent-skill-index.js ./examples/skills --out tmp/skill-index.json --docs tmp/SKILLS.md
 ```
 
 Use it against your own skills:
@@ -59,6 +59,10 @@ bash scripts/validate.sh
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Security
 
