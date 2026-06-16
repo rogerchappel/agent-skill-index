@@ -1,10 +1,15 @@
 #!/usr/bin/env node
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import pkg from "../package.json" with { type: "json" };
 import { buildSkillIndex, renderMarkdownCatalog } from "../src/index.js";
 
 async function main(argv) {
   const args = parseArgs(argv);
+  if (args.version) {
+    console.log(pkg.version);
+    return;
+  }
   if (args.help) {
     printHelp();
     return;
@@ -34,6 +39,7 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--help" || value === "-h") parsed.help = true;
+    else if (value === "--version" || value === "-v") parsed.version = true;
     else if (value === "--out") parsed.out = requireValue(argv, index += 1, "--out");
     else if (value === "--docs") parsed.docs = requireValue(argv, index += 1, "--docs");
     else if (value === "--fail-on-warnings") parsed.failOnWarnings = true;
@@ -64,6 +70,7 @@ Options:
   --out <path>          Write JSON index to a file.
   --docs <path>         Write Markdown catalog to a file.
   --fail-on-warnings    Exit with code 2 if any required metadata is missing.
+  --version             Show the package version.
   --help                Show this help.
 `);
 }
