@@ -7,7 +7,7 @@ Generate a searchable catalog for local agent skills. The CLI scans skill folder
 ```bash
 npm install
 npm run smoke
-node bin/agent-skill-index.js ./test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md
+node bin/agent-skill-index.js ./examples/skills --out tmp/skill-index.json --docs tmp/SKILLS.md
 ```
 
 Use it against your own skills:
@@ -51,5 +51,28 @@ This project is local-first. It reads only under the skill root you provide and 
 npm test
 npm run check
 npm run smoke
+npm run package:smoke
+npm run release:check
 bash scripts/validate.sh
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+## Security
+
+See [SECURITY.md](SECURITY.md).
+
+## Release Verification
+
+Before publishing or tagging a release, run the same verification path used by CI:
+
+- `npm run release:check`
+- `npm run package:smoke`
+
+See `docs/release-readiness.md` for the package surface, CLI bins, and reviewer checklist.
