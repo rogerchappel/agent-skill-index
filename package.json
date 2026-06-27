@@ -23,7 +23,7 @@
     "check": "node --check src/index.js && node --check bin/agent-skill-index.js",
     "smoke": "node bin/agent-skill-index.js test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md && test -s tmp/skill-index.json && test -s tmp/SKILLS.md",
     "build": "npm run check",
-    "package:smoke": "npm pack --dry-run",
+    "package:smoke": "node scripts/package-smoke.mjs",
     "release:check": "npm test && npm run check && npm run smoke && npm run package:smoke"
   },
   "keywords": [
