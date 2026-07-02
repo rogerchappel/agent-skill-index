@@ -18,7 +18,7 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 - `npm run test`: `node --test`
 - `npm run build`: `npm run check`
 - `npm run smoke`: `node bin/agent-skill-index.js test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md && test -s tmp/skill-index.json && test -s tmp/SKILLS.md`
-- `npm run package:smoke`: `npm pack --dry-run`
+- `npm run package:smoke`: verifies the CLI bin, package entrypoint, support docs, release docs, skill instructions, and `npm pack --dry-run` contents
 - `npm run release:check`: `npm test && npm run check && npm run smoke && npm run package:smoke`
 
 Run `npm run release:check` before opening a release PR. Record any skipped command and the reason in the PR body.
