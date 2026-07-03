@@ -39,6 +39,19 @@ const docs = renderMarkdownCatalog(index);
 
 This project is local-first. It reads only under the skill root you provide and writes only the explicit `--out` and `--docs` targets. It does not install, execute, publish, or modify skills.
 
+
+## Verification
+
+Run the local quality gates before opening a pull request:
+
+```sh
+npm run lint
+npm test
+npm run smoke
+```
+
+`npm run lint` is an alias for the repository static check so contributors can use the common npm workflow without guessing the project-specific command.
+
 ## Limitations
 
 - V1 parses common Markdown headings, not every possible custom schema.
