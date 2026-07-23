@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Generate searchable catalogs for local agent skills and safety metadata.",
   "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
   "bin": {
     "agent-skill-index": "bin/agent-skill-index.js"
   },

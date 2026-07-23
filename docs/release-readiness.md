@@ -7,6 +7,8 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 - Package: `agent-skill-index`
 - Repository: `https://github.com/rogerchappel/agent-skill-index`
 - Pack contents are constrained by the `files` allowlist in `package.json`.
+- ESM library entry: `agent-skill-index` -> `src/index.js`
+- Documented exports: `buildSkillIndex`, `parseSkillMarkdown`, and `renderMarkdownCatalog`
 
 ## CLI Surface
 
@@ -18,7 +20,7 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 - `npm run test`: `node --test`
 - `npm run build`: `npm run check`
 - `npm run smoke`: `node bin/agent-skill-index.js test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md && test -s tmp/skill-index.json && test -s tmp/SKILLS.md`
-- `npm run package:smoke`: verifies the CLI bin, package entrypoint, support docs, release docs, skill instructions, and `npm pack --dry-run` contents
+- `npm run package:smoke`: packs and installs the tarball in a temporary consumer, calls the documented ESM exports, exercises the installed CLI, and verifies support files
 - `npm run release:check`: `npm test && npm run check && npm run smoke && npm run package:smoke`
 
 Run `npm run release:check` before opening a release PR. Record any skipped command and the reason in the PR body.
@@ -26,5 +28,5 @@ Run `npm run release:check` before opening a release PR. Record any skipped comm
 ## Reviewer Notes
 
 - Compare README examples with the current CLI bins or module exports.
-- Inspect `npm pack --dry-run` output for generated logs, caches, or private fixtures.
+- Inspect the reported tarball contents for generated logs, caches, or private fixtures.
 - Confirm CI exercises the same release check path used locally.
