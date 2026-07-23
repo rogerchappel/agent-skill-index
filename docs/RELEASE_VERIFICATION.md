@@ -8,11 +8,15 @@ Use this checklist before cutting a package or asking reviewers to trust the cur
 npm run release:check
 ```
 
-The release gate runs the project checks, smoke coverage, and package dry-run declared in `package.json`. CI mirrors the same gate so pull requests exercise the install path and published package boundary.
+The release gate runs the project checks, smoke coverage, and tarball consumer
+check declared in `package.json`. CI mirrors the same gate so pull requests
+exercise the install path and published package boundary.
 
 `npm run package:smoke` must confirm the CLI bin, package entrypoint, skill
 instructions, release-readiness docs, changelog, contribution guide, security
-policy, README, and license are all present in the dry-run package.
+policy, README, and license are present in the tarball. It also installs that
+tarball into an empty temporary consumer, imports and calls the documented ESM
+exports, and runs the installed CLI against a fixture.
 
 ## Package Boundary
 
