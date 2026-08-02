@@ -57,6 +57,17 @@ Use it when frontmatter metadata is available.
   assert.equal(skill.whenToUse, "Use it when frontmatter metadata is available.");
 });
 
+test("decodes quoted frontmatter scalars", () => {
+  const skill = parseSkillMarkdown(`---
+name: 'quoted-skill'
+description: "A quoted description."
+---
+`);
+
+  assert.equal(skill.name, "quoted-skill");
+  assert.equal(skill.description, "A quoted description.");
+});
+
 test("falls back to Markdown metadata when frontmatter is absent or malformed", () => {
   const absent = parseSkillMarkdown(`# heading-name
 
