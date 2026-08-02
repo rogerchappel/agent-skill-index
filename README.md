@@ -26,6 +26,25 @@ npx agent-skill-index ~/.codex/skills --out skill-index.json --docs SKILLS.md --
 - Safety level inferred from side effects, approvals, and tools.
 - Warnings for missing metadata.
 
+### Skill Metadata Forms
+
+Skills may provide `name` and `description` as plain, single-quoted, or
+double-quoted scalar values in a YAML frontmatter block at the very start of
+`SKILL.md`:
+
+```markdown
+---
+name: release-readiness
+description: Check whether a package is ready to release.
+---
+```
+
+Frontmatter values take precedence over Markdown title and description
+fallbacks. The frontmatter block is metadata and is never included as catalog
+prose. If the block is malformed, the parser ignores its values and uses the
+existing Markdown heading and body fallbacks. Other skill fields continue to
+come from their documented Markdown sections.
+
 ## Library API
 
 ```js
@@ -54,8 +73,8 @@ npm run smoke
 
 ## Limitations
 
-- V1 parses common Markdown headings, not every possible custom schema.
-- Frontmatter support is planned but not implemented.
+- V1 parses common Markdown headings and scalar `name` and `description`
+  frontmatter, not every possible custom schema or YAML collection/block form.
 - Safety level is a heuristic and should be reviewed by a human or a stricter policy engine for high-risk workflows.
 
 ## Verification
