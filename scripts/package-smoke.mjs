@@ -68,9 +68,14 @@ async function smokeInstalledPackage(smokeRoot, tarballPath) {
   await mkdir(fixtureSkillRoot, { recursive: true });
   await writeFile(
     path.join(fixtureSkillRoot, "SKILL.md"),
-    `# package-smoke
+    `---
+name: installed-frontmatter-skill
+description: Verify frontmatter through the installed package surface.
+---
 
-Verify the installed package surface.
+## When To Use
+
+Use this fixture during package verification.
 `,
   );
   await writeFile(
@@ -92,7 +97,11 @@ Verify the installed package surface.
       generatedAt: "2026-01-01T00:00:00.000Z",
     });
     assert.equal(index.skillCount, 1);
-    assert.match(renderMarkdownCatalog(index), /## package-smoke/);
+    assert.equal(index.skills[0].name, "installed-frontmatter-skill");
+    assert.equal(index.skills[0].description, "Verify frontmatter through the installed package surface.");
+    const catalog = renderMarkdownCatalog(index);
+    assert.match(catalog, /## installed-frontmatter-skill/);
+    assert.doesNotMatch(catalog, /description: Verify frontmatter/);
   `;
   execFileSync(process.execPath, ["--input-type=module", "--eval", librarySmoke], {
     cwd: consumerRoot,
@@ -108,7 +117,13 @@ Verify the installed package surface.
 
   const cliIndex = JSON.parse(await readFile(indexPath, "utf8"));
   const cliDocs = await readFile(docsPath, "utf8");
-  if (cliIndex.skillCount !== 1 || !cliDocs.includes("## package-smoke")) {
+  if (
+    cliIndex.skillCount !== 1 ||
+    cliIndex.skills[0].name !== "installed-frontmatter-skill" ||
+    cliIndex.skills[0].description !== "Verify frontmatter through the installed package surface." ||
+    !cliDocs.includes("## installed-frontmatter-skill") ||
+    cliDocs.includes("description: Verify frontmatter")
+  ) {
     throw new Error("installed CLI did not generate the expected catalog");
   }
 }

@@ -50,13 +50,14 @@ export async function buildSkillIndex(root, options = {}) {
 }
 
 export function parseSkillMarkdown(markdown, context = {}) {
-  const sections = splitSections(markdown);
-  const title = firstHeading(markdown) ?? context.directory ?? "unknown-skill";
+  const { body, metadata: frontmatter } = parseFrontmatter(markdown);
+  const sections = splitSections(body);
+  const title = frontmatter?.name || firstHeading(body) || context.directory || "unknown-skill";
   const metadata = {
     name: normalizeTitle(title),
     slug: slugify(context.directory ?? title),
     sourcePath: context.sourcePath ?? null,
-    description: firstContent(sections.description) || firstParagraphAfterTitle(markdown),
+    description: frontmatter?.description || firstContent(sections.description) || firstParagraphAfterTitle(body),
     whenToUse: normalizeBlock(sections.whenToUse),
     requiredTools: listItems(sections.requiredTools),
     inputs: listItems(sections.inputs),
@@ -75,6 +76,48 @@ export function parseSkillMarkdown(markdown, context = {}) {
     safetyLevel: inferSafetyLevel(metadata),
     warnings
   };
+}
+
+function parseFrontmatter(markdown) {
+  const match = markdown.match(/^---[\t ]*\r?\n([\s\S]*?)\r?\n---[\t ]*(?:\r?\n|$)/);
+  if (!match) return { body: markdown, metadata: null };
+
+  const body = markdown.slice(match[0].length);
+  const metadata = {};
+
+  for (const line of match[1].split(/\r?\n/)) {
+    if (!line.trim() || line.trimStart().startsWith("#")) continue;
+    const field = line.match(/^([A-Za-z][A-Za-z0-9_-]*):[\t ]*(.*)$/);
+    if (!field) return { body, metadata: null };
+
+    const value = parseFrontmatterScalar(field[2]);
+    if (value === null) return { body, metadata: null };
+    if (field[1] === "name" || field[1] === "description") metadata[field[1]] = value;
+  }
+
+  return { body, metadata };
+}
+
+function parseFrontmatterScalar(value) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  if (trimmed.startsWith('"')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return typeof parsed === "string" ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  if (trimmed.startsWith("'")) {
+    if (!trimmed.endsWith("'")) return null;
+    return trimmed.slice(1, -1).replace(/''/g, "'");
+  }
+
+  if (/^[\[{]|[>|]$/.test(trimmed)) return null;
+  return trimmed;
 }
 
 export function renderMarkdownCatalog(index) {
