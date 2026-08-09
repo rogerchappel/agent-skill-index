@@ -110,6 +110,14 @@ Use this fixture during package verification.
   });
 
   const binPath = path.join(consumerRoot, "node_modules", ".bin", "agent-skill-index");
+  const help = execFileSync(binPath, ["--help"], {
+    cwd: consumerRoot,
+    encoding: "utf8",
+  });
+  if (!help.includes("Usage:") || !help.includes("--fail-on-warnings")) {
+    throw new Error("installed CLI did not print the expected help");
+  }
+
   execFileSync(binPath, [fixtureRoot, "--out", indexPath, "--docs", docsPath], {
     cwd: consumerRoot,
     stdio: "inherit",
