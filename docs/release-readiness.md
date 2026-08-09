@@ -5,6 +5,7 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 ## Package Surface
 
 - Package: `agent-skill-index`
+- Runtime: Node.js 20 or newer; CI runs this checklist on Node.js 20 and 24.
 - Repository: `https://github.com/rogerchappel/agent-skill-index`
 - Pack contents are constrained by the `files` allowlist in `package.json`.
 - ESM library entry: `agent-skill-index` -> `src/index.js`
@@ -20,7 +21,7 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 - `npm run test`: `node --test`
 - `npm run build`: `npm run check`
 - `npm run smoke`: `node bin/agent-skill-index.js test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md && test -s tmp/skill-index.json && test -s tmp/SKILLS.md`
-- `npm run package:smoke`: packs and installs the tarball in a temporary consumer, calls the documented ESM exports, exercises the installed CLI, and verifies support files
+- `npm run package:smoke`: packs and installs the tarball in a temporary consumer, calls the documented ESM exports, invokes the installed CLI help and catalog paths, and verifies support files
 - `npm run release:check`: `npm test && npm run check && npm run smoke && npm run package:smoke`
 
 Run `npm run release:check` before opening a release PR. Record any skipped command and the reason in the PR body.
