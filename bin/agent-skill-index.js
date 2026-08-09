@@ -1,8 +1,11 @@
 #!/usr/bin/env node
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import pkg from "../package.json" with { type: "json" };
 import { buildSkillIndex, renderMarkdownCatalog } from "../src/index.js";
+
+const pkg = JSON.parse(
+  await readFile(new URL("../package.json", import.meta.url), "utf8"),
+);
 
 async function main(argv) {
   const args = parseArgs(argv);
