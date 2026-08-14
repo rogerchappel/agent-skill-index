@@ -46,7 +46,8 @@ Frontmatter values take precedence over Markdown title and description
 fallbacks. The frontmatter block is metadata and is never included as catalog
 prose. If the block is malformed, the parser ignores its values and uses the
 existing Markdown heading and body fallbacks. Other skill fields continue to
-come from their documented Markdown sections.
+come from their documented Markdown sections. Skill files may use either LF or
+CRLF line endings, including around fenced code blocks in `Examples` sections.
 
 ## Library API
 
