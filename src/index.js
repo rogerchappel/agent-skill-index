@@ -205,7 +205,7 @@ function listItems(block = "") {
 }
 
 function codeBlocks(block = "") {
-  return [...block.matchAll(/```(?:\w+)?\n([\s\S]*?)```/g)]
+  return [...block.matchAll(/```(?:\w+)?\r?\n([\s\S]*?)```/g)]
     .map((match) => match[1].trim())
     .filter(Boolean);
 }
