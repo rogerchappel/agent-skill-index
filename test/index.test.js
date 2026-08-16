@@ -41,6 +41,45 @@ Run tests.
   assert.deepEqual(skill.warnings, []);
 });
 
+test("parses fenced examples consistently with LF and CRLF newlines", () => {
+  const markdown = `# demo
+
+Demo description.
+
+## When To Use
+
+Use for a newline compatibility test.
+
+## Required Tools
+
+- node
+
+## Side-Effect Boundaries
+
+None.
+
+## Approval Requirements
+
+None.
+
+## Examples
+
+\`\`\`bash
+echo ok
+\`\`\`
+
+## Validation Workflow
+
+Run tests.
+`;
+  const lf = parseSkillMarkdown(markdown, { directory: "lf-demo" });
+  const crlf = parseSkillMarkdown(markdown.replaceAll("\n", "\r\n"), { directory: "crlf-demo" });
+
+  assert.deepEqual(crlf.examples, lf.examples);
+  assert.deepEqual(crlf.examples, ["echo ok"]);
+  assert.doesNotMatch(crlf.warnings.join("; "), /Missing examples/);
+});
+
 test("uses leading YAML frontmatter for skill name and description", () => {
   const skill = parseSkillMarkdown(`---
 name: frontmatter-demo
