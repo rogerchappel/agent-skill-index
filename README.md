@@ -8,7 +8,7 @@ the current Node.js runtime.
 ## Quickstart
 
 ```bash
-npm install
+npm ci
 npm run smoke
 node bin/agent-skill-index.js ./examples/skills --out tmp/skill-index.json --docs tmp/SKILLS.md
 ```
@@ -68,6 +68,7 @@ This project is local-first. It reads only under the skill root you provide and 
 Run the local quality gates before opening a pull request:
 
 ```sh
+npm ci
 npm run lint
 npm test
 npm run smoke

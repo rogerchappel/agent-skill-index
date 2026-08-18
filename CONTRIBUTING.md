@@ -3,6 +3,7 @@ Commit focused changes with a short explanation of the skill-index behavior they
 Before opening a pull request, run:
 
 ```sh
+npm ci
 npm test
 npm run check
 npm run smoke
