@@ -5,11 +5,13 @@ Use this checklist before cutting a package or asking reviewers to trust the cur
 ## Local Gate
 
 ```sh
+npm ci
 npm run release:check
 ```
 
 The release gate runs the project checks, smoke coverage, and tarball consumer
-check declared in `package.json`. CI mirrors the same gate so pull requests
+check declared in `package.json`. The locked install must leave
+`package-lock.json` unchanged. CI mirrors the same gate so pull requests
 exercise the install path and published package boundary on the minimum
 supported Node.js major (20) and the current runtime (24).
 

@@ -17,6 +17,7 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 
 ## Verification Commands
 
+- `npm ci`: installs the exact dependency tree recorded in `package-lock.json`
 - `npm run check`: `node --check src/index.js && node --check bin/agent-skill-index.js`
 - `npm run test`: `node --test`
 - `npm run build`: `npm run check`
@@ -24,7 +25,9 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 - `npm run package:smoke`: packs and installs the tarball in a temporary consumer, calls the documented ESM exports, invokes the installed CLI help and catalog paths, and verifies support files
 - `npm run release:check`: `npm test && npm run check && npm run smoke && npm run package:smoke`
 
-Run `npm run release:check` before opening a release PR. Record any skipped command and the reason in the PR body.
+Start from a clean checkout with `npm ci`, then run `npm run release:check`
+before opening a release PR. Record any skipped command and the reason in the
+PR body.
 
 ## Reviewer Notes
 
