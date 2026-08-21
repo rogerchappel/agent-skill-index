@@ -49,6 +49,9 @@ function parseArgs(argv) {
     else if (value.startsWith("--")) throw new CliError(`Unknown option: ${value}`, 2);
     else parsed.positionals.push(value);
   }
+  if (parsed.positionals.length > 1) {
+    throw new CliError(`Expected at most one skills directory, received ${parsed.positionals.length}.`, 2);
+  }
   return parsed;
 }
 
