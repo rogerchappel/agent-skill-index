@@ -19,6 +19,10 @@ Use it against your own skills:
 npx agent-skill-index ~/.codex/skills --out skill-index.json --docs SKILLS.md --fail-on-warnings
 ```
 
+The CLI accepts zero or one skills directory. With no directory it scans the
+current directory. Supplying more than one directory exits with status 2,
+prints an error to stderr, and does not create JSON or Markdown output files.
+
 ## What It Extracts
 
 - Name, slug, description, and source path.
