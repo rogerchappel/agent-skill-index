@@ -150,8 +150,7 @@ export function renderMarkdownCatalog(index) {
 
 function splitSections(markdown) {
   const sections = {};
-  const headingPattern = /^#{2,3}\s+(.+)$/gm;
-  const matches = [...markdown.matchAll(headingPattern)];
+  const matches = markdownHeadings(markdown);
 
   for (let index = 0; index < matches.length; index += 1) {
     const match = matches[index];
@@ -159,10 +158,50 @@ function splitSections(markdown) {
     const start = match.index + match[0].length;
     const end = matches[index + 1]?.index ?? markdown.length;
     const key = sectionKey(title);
-    if (key) sections[key] = markdown.slice(start, end).trim();
+    if (key) {
+      const content = markdown.slice(start, end).trim();
+      sections[key] = [sections[key], content].filter(Boolean).join("\n\n");
+    }
   }
 
   return sections;
+}
+
+function markdownHeadings(markdown) {
+  const headings = [];
+  const lines = markdown.matchAll(/^.*(?:\r?\n|$)/gm);
+  let fence = null;
+
+  for (const lineMatch of lines) {
+    const line = lineMatch[0].replace(/\r?\n$/, "");
+    const fenceMatch = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+
+    if (fenceMatch) {
+      const marker = fenceMatch[1];
+      if (!fence) {
+        fence = { character: marker[0], length: marker.length };
+      } else if (
+        marker[0] === fence.character
+        && marker.length >= fence.length
+        && fenceMatch[2].trim() === ""
+      ) {
+        fence = null;
+      }
+      continue;
+    }
+
+    if (fence) continue;
+    const heading = line.match(/^ {0,3}(#{2,3})[\t ]+(.+?)[\t ]*#*[\t ]*$/);
+    if (!heading) continue;
+    headings.push({
+      0: line,
+      1: heading[2],
+      index: lineMatch.index,
+      length: line.length
+    });
+  }
+
+  return headings;
 }
 
 function sectionKey(title) {
@@ -206,7 +245,7 @@ function listItems(block = "") {
 
 function codeBlocks(block = "") {
   return [...block.matchAll(/```(?:\w+)?\r?\n([\s\S]*?)```/g)]
-    .map((match) => match[1].trim())
+    .map((match) => match[1].replace(/\r\n/g, "\n").trim())
     .filter(Boolean);
 }
 
