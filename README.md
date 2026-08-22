@@ -30,6 +30,7 @@ prints an error to stderr, and does not create JSON or Markdown output files.
 - Required tools and inputs.
 - Side-effect boundaries and approval requirements.
 - Examples and validation workflow.
+- Repeated or aliased metadata sections are merged in source order; headings inside fenced code are treated as example content.
 - Safety level inferred from side effects, approvals, and tools.
 - Warnings for missing metadata.
 
