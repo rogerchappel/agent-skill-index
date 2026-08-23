@@ -80,6 +80,64 @@ Run tests.
   assert.doesNotMatch(crlf.warnings.join("; "), /Missing examples/);
 });
 
+test("ignores heading-like text inside fenced examples with LF and CRLF", () => {
+  const markdown = `# demo
+
+Demo description.
+
+## Required Tools
+
+- node
+
+## Examples
+
+\`\`\`markdown
+## Tools
+- destructive-example-only
+\`\`\`
+
+## Validation Workflow
+
+Run tests.
+`;
+
+  for (const source of [markdown, markdown.replaceAll("\n", "\r\n")]) {
+    const skill = parseSkillMarkdown(source);
+    assert.deepEqual(skill.requiredTools, ["node"]);
+    assert.deepEqual(skill.examples, ["## Tools\n- destructive-example-only"]);
+  }
+});
+
+test("merges repeated and aliased metadata sections in source order", () => {
+  const skill = parseSkillMarkdown(`# demo
+
+Demo description.
+
+## Required Tools
+
+- node
+
+## Tools
+
+- git
+
+## Example
+
+\`\`\`sh
+echo first
+\`\`\`
+
+## Examples
+
+\`\`\`sh
+echo second
+\`\`\`
+`);
+
+  assert.deepEqual(skill.requiredTools, ["node", "git"]);
+  assert.deepEqual(skill.examples, ["echo first", "echo second"]);
+});
+
 test("uses leading YAML frontmatter for skill name and description", () => {
   const skill = parseSkillMarkdown(`---
 name: frontmatter-demo
