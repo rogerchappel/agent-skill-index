@@ -90,5 +90,5 @@ class CliError extends Error {
 
 main(process.argv.slice(2)).catch((error) => {
   process.stderr.write(`${error.message}\n`);
-  process.exitCode = error.code ?? 1;
+  process.exitCode = Number.isInteger(error.code) ? error.code : 1;
 });
