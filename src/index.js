@@ -40,11 +40,14 @@ export async function buildSkillIndex(root, options = {}) {
 
   skills.sort((left, right) => left.name.localeCompare(right.name));
 
+  const warnings = skills.length === 0 ? ["No skills found in scanned directories"] : [];
+
   return {
     generatedAt: options.generatedAt ?? new Date().toISOString(),
     root: absoluteRoot,
     skillCount: skills.length,
-    warningCount: skills.reduce((count, skill) => count + skill.warnings.length, 0),
+    warningCount: skills.reduce((count, skill) => count + skill.warnings.length, 0) + warnings.length,
+    warnings,
     skills
   };
 }
@@ -129,6 +132,10 @@ export function renderMarkdownCatalog(index) {
     `Warnings: ${index.warningCount}`,
     ""
   ];
+
+  for (const warning of index.warnings ?? []) {
+    lines.push(`- Index warning: ${warning}`);
+  }
 
   for (const skill of index.skills) {
     lines.push(`## ${skill.name}`, "");
