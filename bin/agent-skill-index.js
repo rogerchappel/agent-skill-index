@@ -75,7 +75,7 @@ Usage:
 Options:
   --out <path>          Write JSON index to a file.
   --docs <path>         Write Markdown catalog to a file.
-  --fail-on-warnings    Exit with code 2 if any required metadata is missing.
+  --fail-on-warnings    Exit with code 2 if required metadata is missing or no skills are found.
   --version             Show the package version.
   --help                Show this help.
 `);

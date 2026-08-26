@@ -19,6 +19,8 @@ Use it against your own skills:
 npx agent-skill-index ~/.codex/skills --out skill-index.json --docs SKILLS.md --fail-on-warnings
 ```
 
+With `--fail-on-warnings`, the CLI exits with code `2` when any scanned skill is missing required metadata, or when no skills are found in the scanned directories.
+
 The CLI accepts zero or one skills directory. With no directory it scans the
 current directory. Supplying more than one directory exits with status 2,
 prints an error to stderr, and does not create JSON or Markdown output files.
