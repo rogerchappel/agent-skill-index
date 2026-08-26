@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { buildSkillIndex, parseSkillMarkdown, renderMarkdownCatalog } from "../src/index.js";
+
+const cliPath = fileURLToPath(new URL("../bin/agent-skill-index.js", import.meta.url));
 
 test("parses skill sections into normalized metadata", () => {
   const skill = parseSkillMarkdown(`# demo
@@ -212,4 +219,61 @@ test("renders a markdown catalog with warning summaries", async () => {
   assert.doesNotMatch(catalog, /description: Fixture metadata/);
   assert.match(catalog, /## repo-review/);
   assert.match(catalog, /Missing required tools/);
+});
+
+test("reports a warning when the scan root contains no skill directories", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-empty-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  const index = await buildSkillIndex(root, { generatedAt: "2026-08-26T00:00:00.000Z" });
+
+  assert.equal(index.skillCount, 0);
+  assert.equal(index.warningCount, 1);
+  assert.deepEqual(index.warnings, ["No skills found in scanned directories"]);
+});
+
+test("reports zero skills when directories contain no SKILL.md files", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-noskill-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await mkdir(path.join(root, "notes"));
+  await writeFile(path.join(root, "notes", "README.md"), "# notes\n");
+
+  const index = await buildSkillIndex(root, { generatedAt: "2026-08-26T00:00:00.000Z" });
+
+  assert.equal(index.skillCount, 0);
+  assert.equal(index.warningCount, 1);
+  assert.ok(index.warnings.includes("No skills found in scanned directories"));
+});
+
+test("renders index-level warnings in the markdown catalog", () => {
+  const catalog = renderMarkdownCatalog({
+    generatedAt: "2026-08-26T00:00:00.000Z",
+    root: "/tmp/skills",
+    skillCount: 0,
+    warningCount: 1,
+    warnings: ["No skills found in scanned directories"],
+    skills: []
+  });
+
+  assert.match(catalog, /No skills found in scanned directories/);
+});
+
+test("CLI exits with code 2 when no skills are found and --fail-on-warnings is set", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-cli-empty-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  const result = spawnSync(process.execPath, [cliPath, root, "--fail-on-warnings"], { encoding: "utf8" });
+
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /Found 1 skill metadata warning/);
+});
+
+test("CLI exits with code 1 and a plain message when the scan root is missing", () => {
+  const missing = path.join(tmpdir(), "agent-skill-index-does-not-exist");
+
+  const result = spawnSync(process.execPath, [cliPath, missing, "--fail-on-warnings"], { encoding: "utf8" });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /ENOENT/);
+  assert.doesNotMatch(result.stderr, /ERR_INVALID_ARG_TYPE/);
 });
