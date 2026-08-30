@@ -17,6 +17,9 @@ async function main(argv) {
     printHelp();
     return;
   }
+  if (args.out && args.docs && path.resolve(args.out) === path.resolve(args.docs)) {
+    throw new CliError("--out and --docs must resolve to distinct paths.", 2);
+  }
 
   const root = args.positionals[0] ?? ".";
   const index = await buildSkillIndex(root);
