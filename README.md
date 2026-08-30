@@ -24,6 +24,8 @@ With `--fail-on-warnings`, the CLI exits with code `2` when any scanned skill is
 The CLI accepts zero or one skills directory. With no directory it scans the
 current directory. Supplying more than one directory exits with status 2,
 prints an error to stderr, and does not create JSON or Markdown output files.
+The `--out` and `--docs` paths must resolve to distinct filesystem paths. A
+collision exits with status 2 before either output is created or overwritten.
 
 ## What It Extracts
 

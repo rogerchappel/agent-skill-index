@@ -17,6 +17,9 @@ async function main(argv) {
     printHelp();
     return;
   }
+  if (args.out && args.docs && path.resolve(args.out) === path.resolve(args.docs)) {
+    throw new CliError("--out and --docs must resolve to distinct paths.", 2);
+  }
 
   const root = args.positionals[0] ?? ".";
   const index = await buildSkillIndex(root);
@@ -73,8 +76,8 @@ Usage:
   agent-skill-index <skills-dir> [--out skill-index.json] [--docs SKILLS.md] [--fail-on-warnings]
 
 Options:
-  --out <path>          Write JSON index to a file.
-  --docs <path>         Write Markdown catalog to a file.
+  --out <path>          Write JSON index to a file (must differ from --docs).
+  --docs <path>         Write Markdown catalog to a file (must differ from --out).
   --fail-on-warnings    Exit with code 2 if required metadata is missing or no skills are found.
   --version             Show the package version.
   --help                Show this help.
