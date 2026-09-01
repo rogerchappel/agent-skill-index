@@ -102,7 +102,8 @@ function parseFrontmatter(markdown) {
 }
 
 function parseFrontmatterScalar(value) {
-  const trimmed = value.trim();
+  const trimmed = stripFrontmatterInlineComment(value.trim());
+  if (trimmed === null) return null;
   if (!trimmed) return "";
 
   if (trimmed.startsWith('"')) {
@@ -121,6 +122,35 @@ function parseFrontmatterScalar(value) {
 
   if (/^[\[{]|[>|]$/.test(trimmed)) return null;
   return trimmed;
+}
+
+function stripFrontmatterInlineComment(value) {
+  if (value.startsWith("#")) return "";
+
+  const quote = value[0];
+  if (quote !== "'" && quote !== '"') {
+    const comment = value.search(/[\t ]#/);
+    return (comment === -1 ? value : value.slice(0, comment)).trimEnd();
+  }
+
+  for (let index = 1; index < value.length; index += 1) {
+    if (quote === '"' && value[index] === "\\") {
+      index += 1;
+      continue;
+    }
+    if (quote === "'" && value[index] === "'" && value[index + 1] === "'") {
+      index += 1;
+      continue;
+    }
+    if (value[index] !== quote) continue;
+
+    const suffix = value.slice(index + 1);
+    if (!suffix) return value;
+    if (/^[\t ]+#/.test(suffix)) return value.slice(0, index + 1);
+    return null;
+  }
+
+  return null;
 }
 
 export function renderMarkdownCatalog(index) {
