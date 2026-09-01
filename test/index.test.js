@@ -172,6 +172,32 @@ description: "A quoted description."
   assert.equal(skill.description, "A quoted description.");
 });
 
+test("removes YAML inline comments from plain frontmatter scalars with LF and CRLF", () => {
+  for (const newline of ["\n", "\r\n"]) {
+    const skill = parseSkillMarkdown([
+      "---",
+      "name: demo # catalog name",
+      "description: Useful skill # shown to users",
+      "---",
+      ""
+    ].join(newline));
+
+    assert.equal(skill.name, "demo");
+    assert.equal(skill.description, "Useful skill");
+  }
+});
+
+test("preserves hash characters inside quoted frontmatter scalars", () => {
+  const skill = parseSkillMarkdown(`---
+name: 'demo #1' # catalog name
+description: "Useful # skill" # shown to users
+---
+`);
+
+  assert.equal(skill.name, "demo #1");
+  assert.equal(skill.description, "Useful # skill");
+});
+
 test("falls back to Markdown metadata when frontmatter is absent or malformed", () => {
   const absent = parseSkillMarkdown(`# heading-name
 
@@ -186,11 +212,22 @@ description frontmatter-description
 
 Fallback description.
 `);
+  const malformedCommentedScalar = parseSkillMarkdown(`---
+name: "unterminated # value" trailing
+description: ignored
+---
+
+# fallback-comment-name
+
+Fallback comment description.
+`);
 
   assert.equal(absent.name, "heading-name");
   assert.equal(absent.description, "Heading description.");
   assert.equal(malformed.name, "fallback-name");
   assert.equal(malformed.description, "Fallback description.");
+  assert.equal(malformedCommentedScalar.name, "fallback-comment-name");
+  assert.equal(malformedCommentedScalar.description, "Fallback comment description.");
 });
 
 test("builds deterministic index from fixture skills", async () => {
