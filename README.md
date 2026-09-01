@@ -51,6 +51,10 @@ description: Check whether a package is ready to release.
 ---
 ```
 
+Supported scalars may end with a YAML inline comment separated by whitespace.
+The comment is excluded from the catalog value, while `#` characters inside
+single- or double-quoted values are preserved.
+
 Frontmatter values take precedence over Markdown title and description
 fallbacks. The frontmatter block is metadata and is never included as catalog
 prose. If the block is malformed, the parser ignores its values and uses the
