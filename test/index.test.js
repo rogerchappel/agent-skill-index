@@ -87,6 +87,51 @@ Run tests.
   assert.doesNotMatch(crlf.warnings.join("; "), /Missing examples/);
 });
 
+test("extracts tilde-fenced examples with LF and CRLF newlines", () => {
+  const markdown = `# demo
+
+Demo description.
+
+## Examples
+
+~~~javascript
+console.log("tilde");
+~~~
+`;
+
+  for (const source of [markdown, markdown.replaceAll("\n", "\r\n")]) {
+    const skill = parseSkillMarkdown(source);
+    assert.deepEqual(skill.examples, ['console.log("tilde");']);
+    assert.doesNotMatch(skill.warnings.join("; "), /Missing examples/);
+  }
+});
+
+test("respects fenced-example marker characters and lengths", () => {
+  const skill = parseSkillMarkdown(`# demo
+
+Demo description.
+
+## Examples
+
+~~~~text
+~~~
+still inside
+\`\`\`
+~~~~~
+
+\`\`\`\`markdown
+## nested example heading
+\`\`\`
+still inside backticks
+\`\`\`\`\`
+`);
+
+  assert.deepEqual(skill.examples, [
+    "~~~\nstill inside\n```",
+    "## nested example heading\n```\nstill inside backticks"
+  ]);
+});
+
 test("ignores heading-like text inside fenced examples with LF and CRLF", () => {
   const markdown = `# demo
 

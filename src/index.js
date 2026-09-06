@@ -281,9 +281,33 @@ function listItems(block = "") {
 }
 
 function codeBlocks(block = "") {
-  return [...block.matchAll(/```(?:\w+)?\r?\n([\s\S]*?)```/g)]
-    .map((match) => match[1].replace(/\r\n/g, "\n").trim())
-    .filter(Boolean);
+  const examples = [];
+  const lines = block.replace(/\r\n/g, "\n").split("\n");
+  let fence = null;
+  let body = [];
+
+  for (const line of lines) {
+    if (!fence) {
+      const opening = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+      if (!opening) continue;
+      if (opening[1][0] === "`" && opening[2].includes("`")) continue;
+      fence = { character: opening[1][0], length: opening[1].length };
+      body = [];
+      continue;
+    }
+
+    const closing = line.match(/^ {0,3}(`{3,}|~{3,})[\t ]*$/);
+    if (closing && closing[1][0] === fence.character && closing[1].length >= fence.length) {
+      const example = body.join("\n").trim();
+      if (example) examples.push(example);
+      fence = null;
+      body = [];
+      continue;
+    }
+    body.push(line);
+  }
+
+  return examples;
 }
 
 function inferSafetyLevel(skill) {

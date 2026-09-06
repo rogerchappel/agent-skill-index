@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Extract examples from valid tilde fences as well as backtick fences while
+  respecting the opening marker character and length.
+
 ## 0.1.0 - Release candidate
 
 - Provide a local-first CLI for indexing `SKILL.md` folders into JSON and Markdown catalogs.
