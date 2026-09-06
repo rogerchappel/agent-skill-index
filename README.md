@@ -35,6 +35,8 @@ collision exits with status 2 before either output is created or overwritten.
 - Side-effect boundaries and approval requirements.
 - Examples and validation workflow.
 - Repeated or aliased metadata sections are merged in source order; headings inside fenced code are treated as example content.
+- Example bodies may use CommonMark backtick or tilde fences. Closing fences
+  must use the opening character and be at least as long as the opening fence.
 - Safety level inferred from side effects, approvals, and tools.
 - Warnings for missing metadata.
 
@@ -60,7 +62,8 @@ fallbacks. The frontmatter block is metadata and is never included as catalog
 prose. If the block is malformed, the parser ignores its values and uses the
 existing Markdown heading and body fallbacks. Other skill fields continue to
 come from their documented Markdown sections. Skill files may use either LF or
-CRLF line endings, including around fenced code blocks in `Examples` sections.
+CRLF line endings, including around backtick- or tilde-fenced code blocks in
+`Examples` sections.
 
 ## Library API
 
