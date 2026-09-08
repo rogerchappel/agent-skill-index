@@ -243,7 +243,61 @@ description: "Useful # skill" # shown to users
   assert.equal(skill.description, "Useful # skill");
 });
 
-test("falls back to Markdown metadata when frontmatter is absent or malformed", () => {
+test("ignores unrelated collection and block frontmatter values with LF and CRLF", () => {
+  const markdown = `---
+name: metadata-demo
+description: Supported scalar metadata.
+metadata:
+  owner: agents
+  labels:
+    - catalog
+tools: [node, git]
+examples: |
+  first line
+  second line
+---
+
+# Fallback title
+
+Fallback description.
+`;
+
+  for (const source of [markdown, markdown.replaceAll("\n", "\r\n")]) {
+    const skill = parseSkillMarkdown(source);
+    assert.equal(skill.name, "metadata-demo");
+    assert.equal(skill.description, "Supported scalar metadata.");
+  }
+});
+
+test("falls back only for unsupported supported-field values", () => {
+  const invalidName = parseSkillMarkdown(`---
+name:
+  nested: unsupported
+description: Preserved description.
+---
+
+# Fallback name
+
+Fallback description.
+`);
+  const invalidDescription = parseSkillMarkdown(`---
+name: preserved-name
+description: |
+  Unsupported block description.
+---
+
+# Fallback name
+
+Fallback description.
+`);
+
+  assert.equal(invalidName.name, "Fallback name");
+  assert.equal(invalidName.description, "Preserved description.");
+  assert.equal(invalidDescription.name, "preserved-name");
+  assert.equal(invalidDescription.description, "Fallback description.");
+});
+
+test("falls back to Markdown metadata when frontmatter or a supported field is malformed", () => {
   const absent = parseSkillMarkdown(`# heading-name
 
 Heading description.
@@ -272,7 +326,7 @@ Fallback comment description.
   assert.equal(malformed.name, "fallback-name");
   assert.equal(malformed.description, "Fallback description.");
   assert.equal(malformedCommentedScalar.name, "fallback-comment-name");
-  assert.equal(malformedCommentedScalar.description, "Fallback comment description.");
+  assert.equal(malformedCommentedScalar.description, "ignored");
 });
 
 test("builds deterministic index from fixture skills", async () => {
