@@ -297,7 +297,7 @@ Fallback description.
   assert.equal(invalidDescription.description, "Fallback description.");
 });
 
-test("falls back to Markdown metadata when frontmatter is absent or malformed", () => {
+test("falls back to Markdown metadata when frontmatter or a supported field is malformed", () => {
   const absent = parseSkillMarkdown(`# heading-name
 
 Heading description.
@@ -326,7 +326,7 @@ Fallback comment description.
   assert.equal(malformed.name, "fallback-name");
   assert.equal(malformed.description, "Fallback description.");
   assert.equal(malformedCommentedScalar.name, "fallback-comment-name");
-  assert.equal(malformedCommentedScalar.description, "Fallback comment description.");
+  assert.equal(malformedCommentedScalar.description, "ignored");
 });
 
 test("builds deterministic index from fixture skills", async () => {

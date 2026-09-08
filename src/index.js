@@ -90,12 +90,13 @@ function parseFrontmatter(markdown) {
 
   for (const line of match[1].split(/\r?\n/)) {
     if (!line.trim() || line.trimStart().startsWith("#")) continue;
+    if (/^[\t ]/.test(line)) continue;
     const field = line.match(/^([A-Za-z][A-Za-z0-9_-]*):[\t ]*(.*)$/);
     if (!field) return { body, metadata: null };
+    if (field[1] !== "name" && field[1] !== "description") continue;
 
     const value = parseFrontmatterScalar(field[2]);
-    if (value === null) return { body, metadata: null };
-    if (field[1] === "name" || field[1] === "description") metadata[field[1]] = value;
+    if (value !== null) metadata[field[1]] = value;
   }
 
   return { body, metadata };
