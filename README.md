@@ -59,11 +59,14 @@ single- or double-quoted values are preserved.
 
 Frontmatter values take precedence over Markdown title and description
 fallbacks. The frontmatter block is metadata and is never included as catalog
-prose. If the block is malformed, the parser ignores its values and uses the
-existing Markdown heading and body fallbacks. Other skill fields continue to
-come from their documented Markdown sections. Skill files may use either LF or
-CRLF line endings, including around backtick- or tilde-fenced code blocks in
-`Examples` sections.
+prose. Unrelated valid YAML fields may use mappings, sequences, inline
+collections, or block scalars without invalidating supported scalar `name` and
+`description` values. If the block itself is malformed, the parser ignores its
+values. If only `name` or `description` has an unsupported value, that field
+uses its existing Markdown fallback while the other supported scalar is kept.
+Other skill fields continue to come from their documented Markdown sections.
+Skill files may use either LF or CRLF line endings, including around backtick-
+or tilde-fenced code blocks in `Examples` sections.
 
 ## Library API
 
@@ -94,8 +97,8 @@ npm run smoke
 
 ## Limitations
 
-- V1 parses common Markdown headings and scalar `name` and `description`
-  frontmatter, not every possible custom schema or YAML collection/block form.
+- V1 extracts only scalar `name` and `description` values from frontmatter;
+  unrelated YAML fields are tolerated but are not added to the catalog.
 - Safety level is a heuristic and should be reviewed by a human or a stricter policy engine for high-risk workflows.
 
 ## Verification
