@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -412,4 +412,143 @@ test("CLI exits with code 1 and a plain message when the scan root is missing", 
   assert.equal(result.status, 1);
   assert.match(result.stderr, /ENOENT/);
   assert.doesNotMatch(result.stderr, /ERR_INVALID_ARG_TYPE/);
+});
+
+function writeCompleteSkill(root, directory) {
+  return (async () => {
+    await mkdir(path.join(root, directory), { recursive: true });
+    await writeFile(path.join(root, directory, "SKILL.md"), completeSkillMarkdown(directory));
+  })();
+}
+
+function completeSkillMarkdown(name) {
+  return `---
+name: ${name}
+description: Complete ${name} fixture.
+---
+
+## When To Use
+
+Use for ${name} tests.
+
+## Required Tools
+
+- node
+
+## Side-Effect Boundaries
+
+None.
+
+## Approval Requirements
+
+None.
+
+## Examples
+
+\`\`\`sh
+echo ok
+\`\`\`
+
+## Validation Workflow
+
+Run tests.
+`;
+}
+
+test("indexes symlinked skill directories that resolve inside the scan root", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-symlink-inside-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  await writeCompleteSkill(root, "real-skill");
+  await symlink(path.join(root, "real-skill"), path.join(root, "linked-skill"));
+
+  const index = await buildSkillIndex(root, { generatedAt: "2026-09-12T00:00:00.000Z" });
+
+  assert.equal(index.skillCount, 2);
+  assert.deepEqual(index.skills.map((skill) => skill.slug), ["linked-skill", "real-skill"]);
+  assert.deepEqual(index.warnings, []);
+});
+
+test("warns when a symlinked skill directory resolves outside the scan root", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-symlink-outside-"));
+  const outside = await mkdtemp(path.join(tmpdir(), "agent-skill-index-symlink-external-"));
+  t.after(() => {
+    rm(root, { recursive: true, force: true });
+    rm(outside, { recursive: true, force: true });
+  });
+
+  await writeCompleteSkill(root, "real-skill");
+  await writeCompleteSkill(outside, "external-skill");
+  await symlink(path.join(outside, "external-skill"), path.join(root, "linked-skill"));
+
+  const index = await buildSkillIndex(root, { generatedAt: "2026-09-12T00:00:00.000Z" });
+
+  assert.equal(index.skillCount, 1);
+  assert.equal(index.skills[0].slug, "real-skill");
+  assert.equal(index.warningCount, 1);
+  assert.match(index.warnings[0], /Skipped symlinked directory "linked-skill"/);
+  assert.match(index.warnings[0], /outside the scan root/);
+});
+
+test("warns when a symlinked skill directory target is missing", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-symlink-dangling-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  await writeCompleteSkill(root, "real-skill");
+  await symlink(path.join(root, "missing-target"), path.join(root, "broken-link"));
+
+  const index = await buildSkillIndex(root, { generatedAt: "2026-09-12T00:00:00.000Z" });
+
+  assert.equal(index.skillCount, 1);
+  assert.equal(index.warningCount, 1);
+  assert.match(index.warnings[0], /Skipped symlinked directory "broken-link"/);
+  assert.match(index.warnings[0], /target does not exist/);
+});
+
+test("warns when a symlinked skill directory duplicates an indexed skill", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-symlink-dup-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  await writeCompleteSkill(root, "real-skill");
+  await symlink(path.join(root, "real-skill"), path.join(root, "alias-link"));
+
+  const index = await buildSkillIndex(root, { generatedAt: "2026-09-12T00:00:00.000Z" });
+
+  assert.equal(index.skillCount, 1);
+  assert.equal(index.skills[0].slug, "real-skill");
+  assert.equal(index.warningCount, 1);
+  assert.match(index.warnings[0], /Skipped symlinked directory "alias-link"/);
+  assert.match(index.warnings[0], /duplicates skill directory "real-skill"/);
+});
+
+test("skips symlinked files without an index warning", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-symlink-file-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  await writeCompleteSkill(root, "real-skill");
+  await writeFile(path.join(root, "notes.md"), "# notes\n");
+  await symlink(path.join(root, "notes.md"), path.join(root, "notes-link.md"));
+
+  const index = await buildSkillIndex(root, { generatedAt: "2026-09-12T00:00:00.000Z" });
+
+  assert.equal(index.skillCount, 1);
+  assert.deepEqual(index.warnings, []);
+});
+
+test("CLI fails on warnings when a symlinked skill directory is skipped", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-cli-symlink-"));
+  const outside = await mkdtemp(path.join(tmpdir(), "agent-skill-index-cli-external-"));
+  t.after(() => {
+    rm(root, { recursive: true, force: true });
+    rm(outside, { recursive: true, force: true });
+  });
+
+  await writeCompleteSkill(root, "real-skill");
+  await writeCompleteSkill(outside, "external-skill");
+  await symlink(path.join(outside, "external-skill"), path.join(root, "linked-skill"));
+
+  const result = spawnSync(process.execPath, [cliPath, root, "--fail-on-warnings"], { encoding: "utf8" });
+
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /Found 1 skill metadata warning/);
 });
