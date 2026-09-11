@@ -460,7 +460,8 @@ test("indexes symlinked skill directories that resolve inside the scan root", as
   t.after(() => rm(root, { recursive: true, force: true }));
 
   await writeCompleteSkill(root, "real-skill");
-  await symlink(path.join(root, "real-skill"), path.join(root, "linked-skill"));
+  await writeCompleteSkill(path.join(root, "library"), "nested-skill");
+  await symlink(path.join(root, "library", "nested-skill"), path.join(root, "linked-skill"));
 
   const index = await buildSkillIndex(root, { generatedAt: "2026-09-12T00:00:00.000Z" });
 
