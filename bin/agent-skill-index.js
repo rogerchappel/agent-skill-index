@@ -78,7 +78,7 @@ Usage:
 Options:
   --out <path>          Write JSON index to a file (must differ from --docs).
   --docs <path>         Write Markdown catalog to a file (must differ from --out).
-  --fail-on-warnings    Exit with code 2 if required metadata is missing or no skills are found.
+  --fail-on-warnings    Exit with code 2 if required metadata is missing, a skill directory is skipped, or no skills are found.
   --version             Show the package version.
   --help                Show this help.
 `);

@@ -100,6 +100,17 @@ npm run smoke
 - V1 extracts only scalar `name` and `description` values from frontmatter;
   unrelated YAML fields are tolerated but are not added to the catalog.
 - Safety level is a heuristic and should be reviewed by a human or a stricter policy engine for high-risk workflows.
+- Only symlinked skill directories whose targets resolve inside the scan root are indexed; other
+  symlinks are skipped with an index warning so the catalog cannot silently miss skills.
+
+## Symlinked Skill Directories
+
+Skill directories reached through symlinks are indexed when the target resolves to a directory
+inside the scan root (a common `~/.codex/skills` layout). Symlinked entries whose targets resolve
+outside the scan root, point at missing targets, or duplicate an already-indexed skill directory
+are skipped with an index warning instead of being silently dropped, so `--fail-on-warnings`
+also fails when the scan would otherwise be incomplete. Symlinked entries pointing at regular
+files are skipped like plain files.
 
 ## Verification
 
