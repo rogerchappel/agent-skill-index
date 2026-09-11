@@ -1,4 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, realpath, stat } from "node:fs/promises";
 import path from "node:path";
 
 const SECTION_ALIASES = {
@@ -26,12 +26,62 @@ export async function buildSkillIndex(root, options = {}) {
   const absoluteRoot = path.resolve(root);
   const entries = await readdir(absoluteRoot, { withFileTypes: true });
   const skills = [];
+  const warnings = [];
+  const indexedRealPaths = new Map();
+
+  const realRoot = await realpath(absoluteRoot).catch(() => absoluteRoot);
+  const symlinkEntries = [];
 
   for (const entry of entries) {
+    if (entry.isSymbolicLink()) {
+      symlinkEntries.push(entry);
+      continue;
+    }
     if (!entry.isDirectory()) continue;
-    const skillPath = path.join(absoluteRoot, entry.name, "SKILL.md");
+
+    const entryPath = path.join(absoluteRoot, entry.name);
+    const skillPath = path.join(entryPath, "SKILL.md");
     const source = await readOptional(skillPath);
     if (!source) continue;
+
+    const realPath = await realpath(entryPath).catch(() => entryPath);
+    if (indexedRealPaths.has(realPath)) {
+      warnings.push(
+        `Skipped directory "${entry.name}": duplicates skill directory "${indexedRealPaths.get(realPath)}" (same target)`
+      );
+      continue;
+    }
+    indexedRealPaths.set(realPath, entry.name);
+    skills.push(parseSkillMarkdown(source, {
+      directory: entry.name,
+      sourcePath: path.relative(process.cwd(), skillPath)
+    }));
+  }
+
+  for (const entry of symlinkEntries) {
+    const entryPath = path.join(absoluteRoot, entry.name);
+    const target = await resolveSkillSymlink({
+      entry,
+      entryPath,
+      realRoot
+    });
+
+    if (target.warning) {
+      warnings.push(target.warning);
+      continue;
+    }
+    if (!target.isDirectory) continue;
+
+    const skillPath = path.join(entryPath, "SKILL.md");
+    const source = await readOptional(skillPath);
+    if (!source) continue;
+    if (indexedRealPaths.has(target.realPath)) {
+      warnings.push(
+        `Skipped symlinked directory "${entry.name}": duplicates skill directory "${indexedRealPaths.get(target.realPath)}" (same target)`
+      );
+      continue;
+    }
+    indexedRealPaths.set(target.realPath, entry.name);
     skills.push(parseSkillMarkdown(source, {
       directory: entry.name,
       sourcePath: path.relative(process.cwd(), skillPath)
@@ -40,7 +90,9 @@ export async function buildSkillIndex(root, options = {}) {
 
   skills.sort((left, right) => left.name.localeCompare(right.name));
 
-  const warnings = skills.length === 0 ? ["No skills found in scanned directories"] : [];
+  if (skills.length === 0) {
+    warnings.push("No skills found in scanned directories");
+  }
 
   return {
     generatedAt: options.generatedAt ?? new Date().toISOString(),
@@ -324,6 +376,38 @@ function isEmpty(value) {
 
 function slugify(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+async function resolveSkillSymlink({ entry, entryPath, realRoot }) {
+  let targetStat;
+  let realPath;
+
+  try {
+    targetStat = await stat(entryPath);
+    realPath = await realpath(entryPath);
+  } catch (error) {
+    return { warning: `Skipped symlinked directory "${entry.name}": ${describeSymlinkError(error)}` };
+  }
+
+  if (!targetStat.isDirectory()) {
+    return { isDirectory: false };
+  }
+
+  const relative = path.relative(realRoot, realPath);
+  if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative)) {
+    return {
+      warning: `Skipped symlinked directory "${entry.name}": target resolves outside the scan root`
+    };
+  }
+
+  return { isDirectory: true, realPath };
+}
+
+function describeSymlinkError(error) {
+  if (error.code === "ENOENT") return "target does not exist";
+  if (error.code === "ELOOP") return "target resolves through too many symlink levels";
+  if (error.code === "EACCES") return "target is not readable";
+  return `target could not be resolved (${error.code ?? error.message})`;
 }
 
 async function readOptional(filePath) {
