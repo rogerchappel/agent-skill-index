@@ -12,6 +12,7 @@
 - [x] Validate missing safety and verification metadata.
 - [x] Add fixtures and tests.
 - [x] Add smoke command and release-candidate notes.
+- [x] Verify required CLI, library, and documentation artifacts are present in the npm package tarball.
 
 ## Later
 

@@ -29,7 +29,8 @@
     "test": "node --test",
     "smoke": "node bin/agent-skill-index.js test/fixtures/skills --out tmp/skill-index.json --docs tmp/SKILLS.md && test -s tmp/skill-index.json && test -s tmp/SKILLS.md",
     "package:smoke": "node scripts/package-smoke.mjs",
-    "release:check": "npm test && npm run check && npm run smoke && npm run package:smoke"
+    "package:contents": "node scripts/package-content-check.mjs",
+    "release:check": "npm test && npm run check && npm run smoke && npm run package:contents && npm run package:smoke"
   },
   "keywords": [
     "agents",
