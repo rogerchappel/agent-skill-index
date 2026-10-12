@@ -1,6 +1,6 @@
 ---
 name: frontmatter-fixture
-description: Fixture metadata from YAML frontmatter.
+description: Fixture metadata from YAML frontmatter. # deterministic fixture
 ---
 
 ## When To Use
