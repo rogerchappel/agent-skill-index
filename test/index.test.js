@@ -329,6 +329,27 @@ Fallback comment description.
   assert.equal(malformedCommentedScalar.description, "ignored");
 });
 
+test("frontmatter fixture covers malformed and unsupported values with stable fallback diagnostics", async () => {
+  const index = await buildSkillIndex("test/fixtures/skills", {
+    generatedAt: "2026-06-08T00:00:00.000Z"
+  });
+  const fixture = index.skills.find((skill) => skill.slug === "frontmatter-skill");
+
+  assert.equal(fixture.name, "frontmatter-fixture");
+  assert.equal(fixture.description, "Fixture metadata from YAML frontmatter.");
+  assert.deepEqual(fixture.warnings, []);
+  assert.equal(index.warningCount, 6);
+  assert.deepEqual(index.warnings, []);
+  assert.deepEqual(index.skills[2].warnings, [
+    "Missing when-to-use guidance",
+    "Missing required tools",
+    "Missing side-effect boundaries",
+    "Missing approval requirements",
+    "Missing examples",
+    "Missing validation workflow"
+  ]);
+});
+
 test("builds deterministic index from fixture skills", async () => {
   const index = await buildSkillIndex("test/fixtures/skills", {
     generatedAt: "2026-06-08T00:00:00.000Z"
