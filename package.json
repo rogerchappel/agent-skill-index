@@ -13,6 +13,7 @@
   "files": [
     "bin",
     "src",
+    "scripts",
     "examples",
     "docs",
     "SKILL.md",
