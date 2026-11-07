@@ -378,6 +378,23 @@ test("renders a markdown catalog with warning summaries", async () => {
   assert.match(catalog, /Missing required tools/);
 });
 
+test("reports normalized slug collisions without dropping either skill", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "skill-index-collision-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  for (const directory of ["a_b", "a-b"]) {
+    const target = path.join(root, directory);
+    await mkdir(target);
+    await writeFile(path.join(target, "SKILL.md"), "# Example\n\nDescription.");
+  }
+
+  const index = await buildSkillIndex(root, { generatedAt: "2024-01-01T00:00:00.000Z" });
+  assert.equal(index.skillCount, 2);
+  assert.deepEqual(index.skills.map((skill) => skill.slug), ["a-b", "a-b"]);
+  assert.equal(index.warnings.length, 1);
+  assert.match(index.warnings[0], /slug is already used/);
+  assert.equal(index.skills[1].slugCollision, true);
+});
+
 test("reports a warning when the scan root contains no skill directories", async (t) => {
   const root = await mkdtemp(path.join(tmpdir(), "agent-skill-index-empty-"));
   t.after(() => rm(root, { recursive: true, force: true }));
