@@ -90,6 +90,17 @@ export async function buildSkillIndex(root, options = {}) {
 
   skills.sort((left, right) => left.name.localeCompare(right.name));
 
+  const slugOwners = new Map();
+  for (const skill of skills) {
+    const owner = slugOwners.get(skill.slug);
+    if (owner) {
+      warnings.push(`Skipped skill directory "${skill.slug}" collision: slug is already used by "${owner}"`);
+      skill.slugCollision = true;
+    } else {
+      slugOwners.set(skill.slug, skill.sourcePath ?? skill.name);
+    }
+  }
+
   if (skills.length === 0) {
     warnings.push("No skills found in scanned directories");
   }
