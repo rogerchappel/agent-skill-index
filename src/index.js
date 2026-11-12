@@ -151,9 +151,18 @@ function parseFrontmatter(markdown) {
   const body = markdown.slice(match[0].length);
   const metadata = {};
 
-  for (const line of match[1].split(/\r?\n/)) {
+  const lines = match[1].split(/\r?\n/);
+  for (const [index, line] of lines.entries()) {
     if (!line.trim() || line.trimStart().startsWith("#")) continue;
-    if (/^[\t ]/.test(line)) continue;
+    if (/^[\t ]/.test(line)) {
+      const parent = lines.slice(0, index).reverse().find((candidate) => {
+        if (!candidate.trim() || candidate.trimStart().startsWith("#")) return false;
+        return /^[A-Za-z][A-Za-z0-9_-]*:[\t ]*$/.test(candidate);
+      });
+      const parentKey = parent?.match(/^([A-Za-z][A-Za-z0-9_-]*):/)?.[1];
+      if (parentKey === "name" || parentKey === "description") return { body, metadata: null };
+      continue;
+    }
     const field = line.match(/^([A-Za-z][A-Za-z0-9_-]*):[\t ]*(.*)$/);
     if (!field) return { body, metadata: null };
     if (field[1] !== "name" && field[1] !== "description") continue;

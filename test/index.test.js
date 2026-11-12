@@ -243,6 +243,13 @@ description: "Useful # skill" # shown to users
   assert.equal(skill.description, "Useful # skill");
 });
 
+test("rejects indented nested supported metadata instead of partially accepting scalars", () => {
+  const markdown = `---\nname: partial-name\ndescription:\n  nested: unsupported\n---\n\n# Markdown fallback\n\nFallback description.\n`;
+  const skill = parseSkillMarkdown(markdown);
+  assert.equal(skill.name, "Markdown fallback");
+  assert.equal(skill.description, "Fallback description.");
+});
+
 test("ignores unrelated collection and block frontmatter values with LF and CRLF", () => {
   const markdown = `---
 name: metadata-demo
@@ -292,7 +299,7 @@ Fallback description.
 `);
 
   assert.equal(invalidName.name, "Fallback name");
-  assert.equal(invalidName.description, "Preserved description.");
+  assert.equal(invalidName.description, "Fallback description.");
   assert.equal(invalidDescription.name, "preserved-name");
   assert.equal(invalidDescription.description, "Fallback description.");
 });
