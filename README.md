@@ -13,10 +13,16 @@ npm run smoke
 node bin/agent-skill-index.js ./examples/skills --out tmp/skill-index.json --docs tmp/SKILLS.md
 ```
 
-Use it against your own skills:
+Use it against your own skills. The generated JSON and Markdown files go into a
+disposable directory under `/tmp`, not your current working directory; inspect or
+remove that directory when finished. The input skills directory is read-only.
 
 ```bash
-npx agent-skill-index ~/.codex/skills --out skill-index.json --docs SKILLS.md --fail-on-warnings
+mkdir -p /tmp/agent-skill-index-output
+npx agent-skill-index ~/.codex/skills \
+  --out /tmp/agent-skill-index-output/skill-index.json \
+  --docs /tmp/agent-skill-index-output/SKILLS.md \
+  --fail-on-warnings
 ```
 
 With `--fail-on-warnings`, the CLI exits with code `2` when any scanned skill is missing required metadata, or when no skills are found in the scanned directories.
