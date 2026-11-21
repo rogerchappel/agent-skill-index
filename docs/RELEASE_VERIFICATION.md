@@ -12,8 +12,7 @@ npm run release:check
 The release gate runs the project checks, smoke coverage, and tarball consumer
 check declared in `package.json`. The locked install must leave
 `package-lock.json` unchanged. CI mirrors the same gate so pull requests
-exercise the install path and published package boundary on the minimum
-supported Node.js major (20) and the current runtime (24).
+exercise the install path and published package boundary on Node.js 20, 24, and 26.
 
 `npm run package:smoke` must confirm the CLI bin, package entrypoint, skill
 instructions, release-readiness docs, changelog, contribution guide, security
