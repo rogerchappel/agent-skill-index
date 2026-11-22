@@ -2,7 +2,7 @@
 
 Generate a searchable catalog for local agent skills. The CLI scans skill folders, extracts common safety and usage metadata from `SKILL.md`, writes a JSON index for agents, and can also render a human-readable Markdown catalog.
 
-Requires Node.js 20 or newer. CI verifies the release gate on Node.js 20, 24, and 26.
+Requires Node.js 20 or newer. CI verifies the release gate on Node.js 20, 22, 24, and 26.
 
 ## Quickstart
 
