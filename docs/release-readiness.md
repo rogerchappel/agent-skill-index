@@ -5,7 +5,7 @@ Use this checklist before publishing, tagging, or asking reviewers to trust the 
 ## Package Surface
 
 - Package: `agent-skill-index`
-- Runtime: Node.js 20 or newer; CI runs this checklist on Node.js 20, 24, and 26.
+- Runtime: Node.js 20 or newer; CI runs this checklist on Node.js 20, 22, 24, and 26.
 - Repository: `https://github.com/rogerchappel/agent-skill-index`
 - Pack contents are constrained by the `files` allowlist in `package.json`.
 - ESM library entry: `agent-skill-index` -> `src/index.js`
