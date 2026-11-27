@@ -51,6 +51,6 @@
   },
   "homepage": "https://github.com/rogerchappel/agent-skill-index#readme",
   "engines": {
-    "node": ">=20"
+    "node": ">=20 <27"
   }
 }
